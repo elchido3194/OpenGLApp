@@ -65,10 +65,15 @@ int main() {
 
 	//Vertices del triangulo a dibujar
 	GLfloat vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		 0.0f,  0.5f, 0.0f
+		 0.5f,  0.5f, 0.0f, //Top Right
+		 0.5f, -0.5f, 0.0f, //Bottom Right
+		-0.5f, -0.5f, 0.0f, //Bottom Left
+		-0.5f,  0.5f, 0.0f	//Top Left
+	};
 
+	GLuint indices[] = {
+		0, 1, 3, //Primer triangulo (superior)
+		1, 2, 3  //Segundo Triangulo (inferior)
 	};
 
 	//Creacion del buffer
@@ -135,23 +140,33 @@ int main() {
 	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 	//glEnableVertexAttribArray(0);
 
+	GLuint EBO;
+	glGenBuffers(1, &EBO);
 	//Creamos un VAO - Vertex Array Object que permite hacer un bind para que todos los subsiguientes llamadas a las VBO se guarden en dicho array
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
 
-	//HAcemos el Bind del VAO
+	//HAcemos el Bind del VAO (Vertex Array Object)
 	glBindVertexArray(VAO);
 
 	//Esta parte estaba hecha antes, cuando no se utilizaba un VAO
 	//En este caso se utiliza el VAO para evitar llamadas para cada objeto a dibujar.
 
+	//Primero se realiza el bind del Vertex Buffer Object
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	//Luego se realiza el bind del Element Buffer Objects
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	//Realizamos los atributos del VAO 
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 		glEnableVertexAttribArray(0);
 
 	//Unbind el VAO
 	glBindVertexArray(0);
+
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -163,13 +178,16 @@ int main() {
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
 		glBindVertexArray(0);
 
 		glfwSetKeyCallback(window, key_callback);
 		//Intercambio de buffers
 		glfwSwapBuffers(window);
-		
 	}
+
 	glfwTerminate();
 	return 0;
 

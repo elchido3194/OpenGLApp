@@ -69,8 +69,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\El Chido\Desktop\LIBRERIAS VISUAL STUDIO\glew-1.13.0-win32\glew-1.13.0\include\GL;C:\Users\El Chido\Desktop\LIBRERIAS VISUAL STUDIO\glfw-3.1.2\glfw-3.1.2\include\GLFW;C:\Users\El Chido\Desktop\LIBRERIAS VISUAL STUDIO\OPENGL\GLFW\src\Debug;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\El Chido\Desktop\LIBRERIAS VISUAL STUDIO\glew-1.13.0-win32\glew-1.13.0\lib\Release\Win32;C:\Users\El Chido\Desktop\LIBRERIAS VISUAL STUDIO\OPENGL\GLFW\src\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glfw-3.2\include\GLFW;C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glew-1.13.0-win32\glew-1.13.0\include\GL;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glew-1.13.0-win32\glew-1.13.0\lib\Release\Win32;C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glfw-3.2\build\src\Debug;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glew-1.13.0-win32\glew-1.13.0\include\GL;C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glfw-3.2\build\src\Debug;C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glfw-3.2\include\GLFW;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glfw-3.2\build\src\Debug;C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glew-1.13.0-win32\glew-1.13.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -80,7 +84,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;glew32s.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -91,6 +95,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>opengl32.lib;glfw3x64.lib;glew32s.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
