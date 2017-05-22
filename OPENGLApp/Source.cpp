@@ -64,11 +64,22 @@ int main() {
 	glViewport(0, 0, 800, 600);
 
 	//Vertices del triangulo a dibujar
-	GLfloat vertices[] = {
+	/*GLfloat vertices[] = {
 		 0.5f,  0.5f, 0.0f, //Top Right
 		 0.5f, -0.5f, 0.0f, //Bottom Right
 		-0.5f, -0.5f, 0.0f, //Bottom Left
 		-0.5f,  0.5f, 0.0f	//Top Left
+	};*/
+
+	GLfloat vertices[] = {
+		//Primer Triangulo
+		-0.25f, 0.5f, 0.0f,
+		-0.5f, -0.5f, 0.0f,
+		-0.1f, -0.5f, 0.0f,
+		//Segundo Triangulo
+		0.25f, 0.5f, 0.0f,
+		0.1f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
 	};
 
 	GLuint indices[] = {
@@ -77,9 +88,12 @@ int main() {
 	};
 
 	//Creacion del buffer
-	GLuint VBO;
+	GLuint VBO1;
 	//Genera un nombre o ID para el buffer
-	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &VBO1);
+
+	GLuint VBO2;
+	glGenBuffers(1, &VBO2);
 	//VER CAST EN VAO
 	//Binds a buffer to a buffer type
 	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -143,20 +157,22 @@ int main() {
 	GLuint EBO;
 	glGenBuffers(1, &EBO);
 	//Creamos un VAO - Vertex Array Object que permite hacer un bind para que todos los subsiguientes llamadas a las VBO se guarden en dicho array
-	GLuint VAO;
-	glGenVertexArrays(1, &VAO);
+	GLuint VAO1;
+	glGenVertexArrays(1, &VAO1);
 
+	GLuint VAO2;
+	glGenVertexArrays(1, &VAO2);
 	//HAcemos el Bind del VAO (Vertex Array Object)
-	glBindVertexArray(VAO);
+	glBindVertexArray(VAO1);
 
 	//Esta parte estaba hecha antes, cuando no se utilizaba un VAO
 	//En este caso se utiliza el VAO para evitar llamadas para cada objeto a dibujar.
 
 	//Primero se realiza el bind del Vertex Buffer Object
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO1);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	//Luego se realiza el bind del Element Buffer Objects
+	//Luego se realiza el bind del Element Buffer Objects EBO
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
@@ -167,6 +183,16 @@ int main() {
 	//Unbind el VAO
 	glBindVertexArray(0);
 
+	glBindVertexArray(VAO2);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(0);
+
+	glBindVertexArray(0);
+
+
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -176,11 +202,14 @@ int main() {
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO);
+		glBindVertexArray(VAO1);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
 
+		glBindVertexArray(VAO2);
+		glDrawArrays(GL_TRIANGLES, 3, 3);
 		glBindVertexArray(0);
 
 		glfwSetKeyCallback(window, key_callback);
