@@ -71,13 +71,19 @@ int main() {
 		-0.5f, -0.5f, 0.0f, //Bottom Left
 		-0.5f,  0.5f, 0.0f	//Top Left
 	};*/
-
+	GLfloat vertices[] = {
+		//posiciones         //Colores
+		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+		 0.0f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+	};
+	/*
 	GLfloat vertices[] = {
 		 0.5f, -0.5f, 0.0f,
 		 0.0f, 0.5f, 0.0f,
 		-0.5f, -0.5f, 0.0f 
 	};
-
+	*/
 	/*GLfloat vertices[] = {
 		//Primer Triangulo
 		-0.25f, 0.5f, 0.0f,
@@ -108,6 +114,7 @@ int main() {
 	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	//Codigo del vertex shader en GLSL
+	/*
 	const GLchar* vertexShaderSource = "#version 330 core\n"
 		"layout (location = 0) in vec3 position;\n"
 //		"out vec4 vertexColor;\n"
@@ -116,8 +123,19 @@ int main() {
 		"gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
 //		"vertexColor = vec4(0.5f, 0.0f, 0.0f, 1.0f);\n"
 		"}\0";
+*/
+	const GLchar* vertexShaderSource = "#version 330 core\n"
+		"layout (location = 0) in vec3 position;\n"
+		"layout (location = 1) in vec3 aColor;\n"
+		"out vec3 ourColor;\n"
+		"void main ()\n"
+		"{\n"
+		"gl_Position = vec4(position, 1.0f);\n"
+		"ourColor = aColor;\n"
+		"}\0";
 
-	const GLchar* fragmentShaderSource1 = "#version 330 core\n"
+
+/*	const GLchar* fragmentShaderSource1 = "#version 330 core\n"
 //		"in vec4 vertexColor;\n"
 		"out vec4 color;\n"
 		"uniform vec4 uniColor;\n"
@@ -126,7 +144,14 @@ int main() {
 		"color = uniColor;\n"
 		//"color = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
 		"}\0";
-
+*/
+	const GLchar* fragmentShaderSource1 = "#version 330 core\n"
+		"in vec3 ourColor;\n"
+		"out vec4 vertexColor;\n"
+		"void main()\n"
+		"{\n"
+		"vertexColor = vec4(ourColor, 1.0f);\n"
+		"}\0";
 	const GLchar* fragmentShaderSource2 = "#version 330 core\n"
 		"in vec4 vertexColor;\n"
 		"out vec4 color;\n"
@@ -207,9 +232,21 @@ int main() {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	//Realizamos los atributos del VAO 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	//Realizamos los atributos del VAO para la lectura de los datos y su posterior envio hacia el vertex shader
+		//Atributos: location, int size, tipoDato, Normalizado?, Stride, Offset
+
+		//Para el location 0, utilizamos 3 datos (vertices del triangulo), de tipo float, con normalizacion falsa,
+		//el sizeof(float) es 6 ya que tenemos 6 datos (3 vertices y 3 colores) y el offset es 0
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
 		glEnableVertexAttribArray(0);
+
+		//location es 1 (para los colores) y el offset es de 3 (ya que para cada vertex set, los primeros 3 datos son de vertices
+		//y el segundo es de colores)
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)));
+		glEnableVertexAttribArray(1);
+
+
+		
 
 	//Unbind el VAO
 	glBindVertexArray(0);
@@ -233,14 +270,18 @@ int main() {
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		GLfloat time = glfwGetTime();
+		//GLfloat time = glfwGetTime();
 
 		
-		GLfloat rojo = (sin(time) / 2) + 0.5;
-		cout << rojo << endl;
-		GLint vertexColorLocation = glGetUniformLocation(shaderProgram1, "uniColor");
+		//GLfloat rojo = (sin(time) / 2) + 0.5;
+		//cout << rojo << endl;
+		//Unicolor es un uniform. Es decir, es un atributo del shader que puede ser accedido desde afuera del shader.
+		//GLint vertexColorLocation = glGetUniformLocation(shaderProgram1, "uniColor");
+		//Para actualizar el valor del uniform, es necesario utilizar primero el programa
 		glUseProgram(shaderProgram1);
-		glUniform4f(vertexColorLocation, rojo, rojo, rojo, 1.0f);
+		//Se actualiza el uniform mediante la funcion Uniform, la cual es una funcion sobrecargada (es necesario tener en cuenta)
+		//el tipo de dato que tendremos que mandar.
+		//glUniform4f(vertexColorLocation, rojo, rojo, rojo, 1.0f);
 
 		glBindVertexArray(VAO1);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
