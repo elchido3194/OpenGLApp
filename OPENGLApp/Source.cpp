@@ -4,6 +4,7 @@
 //GLFW
 #include <glfw3.h>
 #include <iostream>
+#include "ShaderCompiler.h"
 using namespace std;
 
 void clearGreen(GLFWwindow* window) {
@@ -114,6 +115,10 @@ int main() {
 	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	//Codigo del vertex shader en GLSL
+	
+
+	//Utilizaremos el ShaderCompiler que fue definido de manera anterior
+	Shader shader("vertexShader.vs", "fragmentShader.fs");
 	/*
 	const GLchar* vertexShaderSource = "#version 330 core\n"
 		"layout (location = 0) in vec3 position;\n"
@@ -124,6 +129,7 @@ int main() {
 //		"vertexColor = vec4(0.5f, 0.0f, 0.0f, 1.0f);\n"
 		"}\0";
 */
+/*
 	const GLchar* vertexShaderSource = "#version 330 core\n"
 		"layout (location = 0) in vec3 position;\n"
 		"layout (location = 1) in vec3 aColor;\n"
@@ -144,7 +150,7 @@ int main() {
 		"color = uniColor;\n"
 		//"color = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
 		"}\0";
-*/
+
 	const GLchar* fragmentShaderSource1 = "#version 330 core\n"
 		"in vec3 ourColor;\n"
 		"out vec4 vertexColor;\n"
@@ -197,7 +203,7 @@ int main() {
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader1);
 	glDeleteShader(fragmentShader2);
-
+*/
 	//Linking vertex attributes
 	//Le decimos al VBO como interpretar los datos de la matriz de vertices
 	//1. El primer parametro es el vertex attribute que vamos a utilizar, en este caso es el 0 dado por location=0 en el vertex shader
@@ -278,10 +284,14 @@ int main() {
 		//Unicolor es un uniform. Es decir, es un atributo del shader que puede ser accedido desde afuera del shader.
 		//GLint vertexColorLocation = glGetUniformLocation(shaderProgram1, "uniColor");
 		//Para actualizar el valor del uniform, es necesario utilizar primero el programa
-		glUseProgram(shaderProgram1);
+		//glUseProgram(shaderProgram1);
 		//Se actualiza el uniform mediante la funcion Uniform, la cual es una funcion sobrecargada (es necesario tener en cuenta)
 		//el tipo de dato que tendremos que mandar.
 		//glUniform4f(vertexColorLocation, rojo, rojo, rojo, 1.0f);
+
+		
+		shader.use();
+		shader.setFloat("offset", 0.25f);
 
 		glBindVertexArray(VAO1);
 		glDrawArrays(GL_TRIANGLES, 0, 3);

@@ -69,7 +69,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glfw-3.2\include\GLFW;C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glew-1.13.0-win32\glew-1.13.0\include\GL;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glfw-3.2\deps\glad;C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glfw-3.2\include\GLFW;C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glew-1.13.0-win32\glew-1.13.0\include\GL;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glew-1.13.0-win32\glew-1.13.0\lib\Release\Win32;C:\Users\Elchido\Desktop\OpenGL\glfw-3.2\glfw-3.2\build\src\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -129,6 +129,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ShaderCompiler.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fragmentShader.fs" />
+    <None Include="vertexShader.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
