@@ -1,6 +1,8 @@
 //GLEW
-#define GLEW_STATIC
-#include <glew.h>
+//#define GLEW_STATIC
+//#include <glew.h>
+//GLAD
+#include <glad\glad.h>
 //GLFW
 #include <glfw3.h>
 #include <iostream>
@@ -57,12 +59,13 @@ int main() {
 	glfwMakeContextCurrent(window);
 	//glfwSetKeyCallback(window, key_callback);
 
-	glewExperimental = GL_TRUE;
-	if (glewInit() != GLEW_OK) {
-
-		std::cout << "Failed to initialize GLEW" << std::endl;
+	//glewExperimental = GL_TRUE;
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
+
 	glViewport(0, 0, 800, 600);
 
 	//Vertices del triangulo a dibujar

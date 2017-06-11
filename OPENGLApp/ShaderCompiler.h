@@ -1,6 +1,8 @@
 #ifndef SHADER_H
 #define SHADER_H
-#include <glew.h>
+//#include <glew.h>
+//GLAD
+#include <glad\glad.h>
 //GLFW
 #include <glfw3.h>
 #include <iostream>
