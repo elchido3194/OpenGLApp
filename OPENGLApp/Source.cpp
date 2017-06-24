@@ -6,7 +6,12 @@
 //GLFW
 #include <glfw3.h>
 #include <iostream>
+//permite la compilacion externa de los shaders
 #include "ShaderCompiler.h"
+
+//permite la carga de texturas
+#include "stb_image.h"
+
 using namespace std;
 
 void clearGreen(GLFWwindow* window) {
@@ -74,12 +79,26 @@ int main() {
 		 0.5f, -0.5f, 0.0f, //Bottom Right
 		-0.5f, -0.5f, 0.0f, //Bottom Left
 		-0.5f,  0.5f, 0.0f	//Top Left
-	};*/
+	};
 	GLfloat vertices[] = {
 		//posiciones         //Colores
 		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
 		 0.0f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
 		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+	};
+
+	GLfloat texCoord[] = {
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		0.5f, 1.0f
+	};
+	*/
+	GLfloat vertices[] = {
+		//posiciones			//Colores		//Textura
+		 0.5f,   0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+		 0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+		-0.5f,  -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		-0.8f,   0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f
 	};
 	/*
 	GLfloat vertices[] = {
@@ -246,13 +265,17 @@ int main() {
 
 		//Para el location 0, utilizamos 3 datos (vertices del triangulo), de tipo float, con normalizacion falsa,
 		//el sizeof(float) es 6 ya que tenemos 6 datos (3 vertices y 3 colores) y el offset es 0
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 		glEnableVertexAttribArray(0);
 
 		//location es 1 (para los colores) y el offset es de 3 (ya que para cada vertex set, los primeros 3 datos son de vertices
 		//y el segundo es de colores)
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)));
 		glEnableVertexAttribArray(1);
+
+		//location 2 es para las texturas 
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(2);
 
 
 		
@@ -268,6 +291,39 @@ int main() {
 		glEnableVertexAttribArray(0);
 
 	glBindVertexArray(0);
+
+	//Creamos el objeto de texturas
+	GLuint textures;
+	glGenTextures(1, &textures);
+	//Bindeamos el objeto al tipo GL_texture_2d
+	glBindTexture(GL_TEXTURE_2D, textures);
+
+	//Seteamos los parametros para la textura
+	//Para el eje X
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	//Para el eje Y
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	//
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	//Este color unicamente se define si CLAMP_TO_BORDER ha sido implementado
+	float borderColor[] = {
+		1.0f, 0.0f, 0.0f, 0.0f
+	};
+	//Pasamos el color a los parametros de la textura
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	//utilizamos stb_image para cargar las texturas
+
+	int width, height, nrChannel;
+	unsigned char *data = stbi_load("container.jpg", &width, &height, &nrChannel, 0);
+
+	//Generamos la textura mediante glteximage2d
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	//generamos el Mipmap
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	stbi_image_free(data);
 
 
 
@@ -294,12 +350,13 @@ int main() {
 
 		
 		shader.use();
-		shader.setFloat("offset", 0.25f);
+		//shader.setFloat("offset", 0.25f);
 
+		glBindTexture(GL_TEXTURE_2D, textures);
 		glBindVertexArray(VAO1);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 /*
 		glUseProgram(shaderProgram2);
