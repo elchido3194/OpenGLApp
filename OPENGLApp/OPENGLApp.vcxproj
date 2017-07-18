@@ -133,12 +133,18 @@
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="matrices.h" />
     <ClInclude Include="ShaderCompiler.h" />
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragmentShader.fs" />
     <None Include="vertexShader.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="awesomeface.jpg" />
+    <Image Include="container.jpg" />
+    <Image Include="container1.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
