@@ -10,7 +10,7 @@ uniform float visible;
 
 void main()
 {
-	vec2 textureCoordInv = vec2(-textureCoord.x, textureCoord.y);
+	vec2 textureCoordInv = vec2(textureCoord.x, textureCoord.y);
 	//color = vec4(ourColor, 1.0);
 	//color = texture(ourTexture1, textureCoord) * vec4(ourColor, 1.0);
 	color = mix(texture(texture1, textureCoord), texture(texture2, textureCoordInv), visible);

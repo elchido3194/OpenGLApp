@@ -7,6 +7,10 @@
 #include "ShaderCompiler.h"
 //textures
 #include "stb_image.h"
+//Math
+#include <glm.hpp>
+#include <gtc\matrix_transform.hpp>
+#include <gtc\type_ptr.hpp>
 
 #define LOG(x) std::cout << x << std::endl;
 using namespace std;
@@ -80,6 +84,8 @@ int main() {
 		0, 1, 3, //Primer triangulo (superior)
 		1, 2, 3  //Segundo Triangulo (inferior)
 	};
+
+	
 
 	//Creamos los buffers para pasar el array hacia el vertex Shader
 	GLuint VBO1;
@@ -177,7 +183,7 @@ int main() {
 
 	data = stbi_load("awesomeface.png", &width, &height, &nrChannel, 0);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	//generamos el Mipmap
 	glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -189,7 +195,8 @@ int main() {
 	//Seteamos los sampler uniforms de los shaders a las texture units 1 y 2
 
 	shader.setInt("texture1", 0);
-	//shader.setInt("texture2", 1);
+	shader.setInt("texture2", 1);
+	
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -198,15 +205,30 @@ int main() {
 
 		GLfloat time = glfwGetTime();
 
+		GLfloat time2 = (sin((double)glfwGetTime())/2)+0.5;
+
 		shader.use();
+		glm::mat4 trans;
+		//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		trans = glm::translate(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+		trans = glm::rotate(trans, (float)time, glm::vec3(0.0f, 0.0f, 1.0f));
+		
+		shader.setMat4x4("transform", glm::value_ptr(trans));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture1);
 
-		//glActiveTexture(GL_TEXTURE1);
-		//glBindTexture(GL_TEXTURE_2D, texture2);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture2);
 
 		glBindVertexArray(VAO1);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		
+		glm::mat4 trans2;
+		trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 0.0f));
+		trans2 = glm::scale(trans2, glm::vec3(time2, time2, time2));
+		shader.setMat4x4("transform", glm::value_ptr(trans2));
+
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
