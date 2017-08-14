@@ -15,60 +15,27 @@
 #define LOG(x) std::cout << x << std::endl
 #define screenWidth 800
 #define screenHeight 600
-using namespace std;
+//using namespace std;
 
 float valor = 0.5f;
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+float yaw = -90.0f;
+float pitch = 0.0f;
+
 glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-
-void add() {
-	valor = valor + 0.1f;
-}
-
-void sub() {
-
-	valor = valor - 0.1f;
-}
+glm::vec3 front;
 
 void clearGreen(GLFWwindow* window) {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
-
-	float cameraAcceleration = 0.1f;
-	if (key == GLFW_KEY_UP) {
-		add();
-	}
-	if (key == GLFW_KEY_DOWN) {
-		sub();
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		cameraPosition += cameraFront*cameraAcceleration;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		cameraPosition -= cameraFront*cameraAcceleration;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		cameraPosition += glm::normalize(glm::cross(cameraFront, cameraUp))*cameraAcceleration;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		cameraPosition -= glm::normalize(glm::cross(cameraFront, cameraUp))*cameraAcceleration;
-	}
-
-
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GL_TRUE);
-
-}
-
+void inputProcess(GLFWwindow* window);
 
 int main() {
 
@@ -295,14 +262,23 @@ int main() {
 	glm::mat4 projec;
 	projec = glm::perspective(glm::radians(45.0f), (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);
 
-	
 
 	while (!glfwWindowShouldClose(window)) {
-		glfwPollEvents();
+
+		float currentframe = glfwGetTime();
+		deltaTime = currentframe - lastFrame;
+		lastFrame = currentframe;
+
+		//glfwPollEvents();
+		inputProcess(window);
+
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		GLfloat time = glfwGetTime();
+
+		// Esto permite calcular el tiempo delta, para determinar cuando se demora en renderizar el anterior frame
+		//y poder syncronizar el movimiento dentro de la escena.
 
 		GLfloat time2 = (sin((double)glfwGetTime())/2)+0.5;
 
@@ -314,6 +290,12 @@ int main() {
 		//shader.setMat4x4("transform", glm::value_ptr(trans));
 		//trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
 
+		
+		front.x = cos(glm::radians(yaw))*cos(glm::radians(pitch));
+		front.y = sin(glm::radians(pitch));
+		front.z = sin(glm::radians(yaw))*cos(glm::radians(pitch));
+		cameraFront = glm::normalize(front);
+		
 
 		//MAtrices de Transformacion de Sistemas Coordenados
 
@@ -323,6 +305,7 @@ int main() {
 		//model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 		//2da View
 		//Trasladamos la escena hacia atras para dar la impresion que la camara se movio hacia adelante.
+		
 		glm::mat4 view;
 		//view = glm::rotate(view, glm::radians(-30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		//view = glm::translate(view, glm::vec3(0.0f, 0.0f, 3.0f));
@@ -401,14 +384,55 @@ int main() {
 
 		glBindVertexArray(0);
 
-		glfwSetKeyCallback(window, key_callback);
 
 		shader.setFloat("visible", valor);
 		glfwSwapBuffers(window);
+		glfwPollEvents();
 
 	}
 	glfwTerminate();
 	return 0;
 
+
+}
+
+void inputProcess(GLFWwindow* window) {
+
+	float cameraAcceleration = 1.0f*deltaTime;
+	
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		cameraPosition += cameraFront*cameraAcceleration;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		cameraPosition -= cameraFront*cameraAcceleration;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		cameraPosition += glm::normalize(glm::cross(cameraFront, cameraUp))*cameraAcceleration;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		cameraPosition -= glm::normalize(glm::cross(cameraFront, cameraUp))*cameraAcceleration;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		pitch += 1.0f;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		pitch -= 1.0f;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		yaw += 1.0f;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		yaw -= 1.0f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, GL_TRUE);
 
 }
